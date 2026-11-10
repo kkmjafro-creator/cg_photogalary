@@ -2,48 +2,63 @@
 (function () {
   const { C, CLASSES, SUGGESTED, client, configured, esc, uniquePath, classLabel, validateFile, signedUrls, toast, fmtDate } = window.ARG;
   const $ = id => document.getElementById(id);
-  const ADMIN_USERNAME = "admin123";
-  const ADMIN_PASSWORD = "cg@kkm";
 
   let photos = [];
   let urls = {};
   let editing = null;
   let deleting = null;
+  let currentUser = null;
 
   /* ---------- boot / auth ---------- */
-  function boot() { showLogin(); }
+  async function boot() {
+    const { data } = await client.auth.getSession();
+    if (data.session && await isAdmin()) enterDashboard(data.session.user);
+    else showLogin();
+  }
+
+  async function isAdmin() {
+    const { data } = await client.rpc("is_career_admin");
+    return data === true;
+  }
 
   function showLogin() {
     $("dashView").classList.add("hidden");
     $("loginView").classList.remove("hidden");
   }
 
-  $("loginForm").addEventListener("submit", e => {
+  $("loginForm").addEventListener("submit", async e => {
     e.preventDefault();
     const err = $("loginErr"); err.classList.add("hidden");
-    const name = $("username").value.trim();
     const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
     try {
-      if (name !== ADMIN_USERNAME || $("password").value !== ADMIN_PASSWORD)
-        throw new Error("Invalid username or password.");
+      const { data, error } = await client.auth.signInWithPassword({
+        email: $("username").value.trim(),
+        password: $("password").value
+      });
+      if (error) throw error;
+      if (!(await isAdmin())) {
+        await client.auth.signOut();
+        throw new Error("This account is not an administrator.");
+      }
       $("password").value = "";
-      enterDashboard();
+      enterDashboard(data.user);
     } catch (ex) {
       err.textContent = ex.message; err.classList.remove("hidden");
     } finally { btn.disabled = false; btn.textContent = "Login"; }
   });
 
-  $("logoutBtn").addEventListener("click", () => {
+  $("logoutBtn").addEventListener("click", async () => {
+    await client.auth.signOut();
     photos = []; urls = {}; showLogin();
   });
 
-  async function enterDashboard() {
+  async function enterDashboard(user) {
+    currentUser = user;
     $("loginView").classList.add("hidden");
     $("dashView").classList.remove("hidden");
-    $("configBanner").classList.remove("hidden");
-    $("welcome").textContent = "Signed in as " + ADMIN_USERNAME + ".";
+    $("welcome").textContent = "Signed in as " + user.email + ".";
     buildStaticUI();
-    if (configured && client) await loadPhotos();
+    await loadPhotos();
     switchTab("overview");
   }
 
