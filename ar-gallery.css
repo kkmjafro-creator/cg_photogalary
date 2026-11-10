@@ -23,7 +23,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:14px clamp(16px,4vw,48px);background:rgba(7,7,10,.72);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--glass-b)}
-.brand{display:flex;flex-direction:column;line-height:1.15}
+.brand{display:flex;align-items:center;gap:12px;line-height:1.15}
+.brand img{width:44px;height:44px;object-fit:contain}
+.brand span{display:flex;flex-direction:column}
 .brand small{color:var(--muted);letter-spacing:.2em;font-size:.68rem;text-transform:uppercase}
 .brand b{font-size:1.05rem;letter-spacing:.06em;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .topnav{display:flex;gap:8px;flex-wrap:wrap}
