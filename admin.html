@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin – AR Photo Gallery</title>
+<link rel="stylesheet" href="ar-gallery.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><small>Career Fair</small><b>AR GALLERY ADMIN</b></div>
+  <nav class="topnav">
+    <a class="btn sm" href="ar-gallery.html">View Public Gallery</a>
+  </nav>
+</header>
+
+<div id="configBanner" class="banner hidden" style="max-width:700px;margin:20px auto">
+  Admin login is a browser-side check only. It does not authenticate with Supabase; protected photo uploads and changes still require a Supabase-authorized session. Configure <b>config.js</b> to connect the gallery.
+</div>
+
+<!-- LOGIN -->
+<main id="loginView" class="hidden">
+  <form class="login-box glass" id="loginForm" autocomplete="on">
+    <h1 class="page-title">Administrator Login</h1>
+    <p style="color:var(--muted);margin-bottom:22px">Sign in to manage the AR photo gallery.</p>
+    <div class="field"><label for="username">Username</label>
+      <input class="input" id="username" autocomplete="username" required></div>
+    <div class="field"><label for="password">Password</label>
+      <input class="input" id="password" type="password" autocomplete="current-password" required></div>
+    <div id="loginErr" class="banner hidden" style="margin:0 0 16px"></div>
+    <button class="btn gold" id="loginBtn" style="width:100%">Login</button>
+  </form>
+</main>
+
+<!-- DASHBOARD -->
+<main id="dashView" class="wrap hidden">
+  <div class="layout">
+    <nav class="side glass">
+      <button data-tab="overview" class="active">Overview</button>
+      <button data-tab="upload">Upload AR Photo</button>
+      <button data-tab="manage">Manage Gallery</button>
+      <button data-tab="folders">Manage Class Folders</button>
+      <button id="logoutBtn">Logout</button>
+    </nav>
+
+    <div>
+      <!-- Overview -->
+      <section class="panel glass" id="tab-overview">
+        <h2 class="page-title">Overview</h2>
+        <div class="stats" id="stats"></div>
+        <p style="color:var(--muted)" id="welcome"></p>
+      </section>
+
+      <!-- Upload -->
+      <section class="panel glass hidden" id="tab-upload">
+        <h2 class="page-title">Upload AR Photo</h2>
+        <form id="uploadForm" style="margin-top:18px">
+          <div class="field"><label>Select Class</label>
+            <div class="radio-row" id="uClassRow"></div></div>
+          <div class="two">
+            <div>
+              <div class="field"><label for="uCareer">Career Name</label>
+                <input class="input" id="uCareer" list="careerList" maxlength="80" required placeholder="e.g. Aerospace Engineer"></div>
+              <datalist id="careerList"></datalist>
+              <div class="field"><label for="uDesc">Short Description</label>
+                <textarea class="textarea" id="uDesc" maxlength="300" placeholder="One or two lines about this career"></textarea></div>
+              <div class="field"><label for="uFile">Upload Image (JPG, JPEG, PNG, WEBP – max 5 MB)</label>
+                <input class="input" id="uFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required></div>
+              <div class="field"><label>Status</label>
+                <div class="radio-row">
+                  <label><input type="radio" name="uStatus" value="publish" checked><span>Publish</span></label>
+                  <label><input type="radio" name="uStatus" value="draft"><span>Save as Draft</span></label>
+                </div></div>
+            </div>
+            <div>
+              <label style="font-size:.85rem;color:var(--muted)">Image Preview</label>
+              <div class="preview-box" id="uPreview" style="margin-top:6px">No image selected</div>
+            </div>
+          </div>
+          <div class="progress hidden" id="uProg"><i></i></div>
+          <button class="btn gold" id="uBtn" style="margin-top:20px">Upload</button>
+        </form>
+      </section>
+
+      <!-- Manage -->
+      <section class="panel glass hidden" id="tab-manage">
+        <h2 class="page-title">Manage Gallery</h2>
+        <div class="toolbar">
+          <input class="input grow" id="mSearch" type="search" placeholder="Search uploaded images…">
+          <select class="select" id="mClass" style="max-width:180px"><option value="">All classes</option></select>
+          <select class="select" id="mStatus" style="max-width:180px">
+            <option value="">All statuses</option><option value="pub">Published</option><option value="draft">Drafts</option>
+          </select>
+        </div>
+        <div class="list" id="mList"></div>
+      </section>
+
+      <!-- Folders -->
+      <section class="panel glass hidden" id="tab-folders">
+        <h2 class="page-title">Manage Class Folders</h2>
+        <p style="color:var(--muted);margin:8px 0 18px">Each class is a folder in storage (<code>career-fair-ar/class-9/</code> …). Careers appear as soon as you upload a photo with that career name. Gold chips already have photos; grey chips are suggestions you can still add.</p>
+        <div id="folderList"></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- Edit modal -->
+<div class="modal hidden" id="editModal">
+  <form class="box glass" id="editForm">
+    <h3>Edit AR Photo</h3>
+    <div class="field"><label>Class</label><select class="select" id="eClass"></select></div>
+    <div class="field"><label>Career Name</label><input class="input" id="eCareer" list="careerList" maxlength="80" required></div>
+    <div class="field"><label>Short Description</label><textarea class="textarea" id="eDesc" maxlength="300"></textarea></div>
+    <div class="field"><label>Replace Photo (optional)</label>
+      <input class="input" id="eFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"></div>
+    <div class="preview-box" id="ePreview" style="margin-bottom:16px"></div>
+    <div class="field"><label><input type="checkbox" id="ePub"> Published</label></div>
+    <div class="actions">
+      <button class="btn gold" id="eSave">Save Changes</button>
+      <button type="button" class="btn" id="eCancel">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- Delete confirm -->
+<div class="modal hidden" id="delModal">
+  <div class="box glass">
+    <h3>Delete this photo?</h3>
+    <p id="delText" style="color:var(--muted);margin-bottom:18px"></p>
+    <div class="actions">
+      <button class="btn danger" id="delYes">Yes, delete permanently</button>
+      <button class="btn" id="delNo">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AR Photo Gallery – Career Fair: Engineering &amp; Technology</title>
+<link rel="stylesheet" href="ar-gallery.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><small>Career Fair</small><b>ENGINEERING &amp; TECHNOLOGY</b></div>
+  <nav class="topnav">
+    <a class="btn sm" id="homeLink" href="../index.html">← Main Site</a>
+    <a class="btn sm" href="admin.html">Admin</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div id="configBanner" class="banner hidden">
+    Supabase is not configured yet. Open <b>config.js</b> and set SUPABASE_URL and SUPABASE_ANON_KEY.
+  </div>
+
+  <!-- VIEW 1: class selection -->
+  <section id="viewClasses">
+    <div class="hero">
+      <h1>AR PHOTO GALLERY</h1>
+      <p>Choose your class, pick a career background and step into your future for an AR photo.</p>
+    </div>
+    <div class="class-grid" id="classGrid"></div>
+  </section>
+
+  <!-- VIEW 2: class gallery -->
+  <section id="viewGallery" class="hidden">
+    <button class="btn sm" id="backToClasses">← Return to Class Selection</button>
+    <div class="toolbar" style="margin-bottom:0">
+      <h2 class="page-title grow" id="galleryTitle"></h2>
+    </div>
+    <div class="toolbar">
+      <input class="input grow" id="searchBox" type="search" placeholder="Search career names…" aria-label="Search careers">
+      <select class="select" id="careerFilter" style="max-width:260px" aria-label="Filter careers">
+        <option value="">All careers</option>
+      </select>
+    </div>
+    <div id="galleryMsg" class="empty hidden"></div>
+    <div class="masonry" id="masonry"></div>
+  </section>
+</main>
+
+<!-- Full-screen viewer -->
+<div class="overlay hidden" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="btn sm close-btn" id="lbClose">✕ Close</button>
+  <div class="stage">
+    <button class="nav-btn prev" id="lbPrev" aria-label="Previous">‹</button>
+    <img id="lbImg" alt="">
+    <button class="nav-btn next" id="lbNext" aria-label="Next">›</button>
+  </div>
+  <div class="info">
+    <div>
+      <h3 id="lbTitle"></h3>
+      <p id="lbDesc"></p>
+      <span class="tag" id="lbClass"></span> <small id="lbCount" style="color:var(--muted)"></small>
+    </div>
+    <div class="actions">
+      <button class="btn" id="lbBack">Return to Gallery</button>
+      <button class="btn gold" id="lbSelect">Select Background</button>
+    </div>
+  </div>
+</div>
+
+<!-- Selected background / photo booth panel -->
+<div class="overlay booth hidden" id="booth" role="dialog" aria-modal="true" aria-label="Selected background">
+  <div class="booth-inner">
+    <div class="booth-preview"><img id="boothImg" alt=""></div>
+    <div class="glass booth-side">
+      <span class="tag" id="boothClass"></span>
+      <h2 id="boothTitle" style="margin-top:10px"></h2>
+      <p id="boothDesc" style="color:var(--muted);margin-top:6px"></p>
+      <p style="margin-top:16px;font-size:.8rem;color:var(--muted)">Background file name</p>
+      <div class="filebox" id="boothFile"></div>
+      <ol class="steps">
+        <li>Tell the photo booth operator this career name and file name.</li>
+        <li>The operator downloads the background (button below) and sets it as the image/background source in OBS Studio.</li>
+        <li>Then take your photo with Open Photo Booth.</li>
+      </ol>
+      <div class="actions">
+        <button class="btn gold" id="boothDownload">⬇ Download Background</button>
+        <button class="btn" id="boothFull">⛶ Full-Screen Booth View</button>
+        <button class="btn" id="boothReturn">← Return to Gallery</button>
+      </div>
+      <p class="notice">This page does not control OBS automatically. The background is applied in OBS by the operator using the downloaded image or the full-screen view.</p>
+    </div>
+  </div>
+</div>
+
+<div class="fullscreen-bg hidden" id="fsBg"><span>Tap or press Esc to exit</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script src="gallery.js"></script>
+</body>
+</html>
